@@ -38,7 +38,9 @@ INSTALLATION
 ------------
  
  1) Создайте конфигурационные файлы из копий *.loc
+ <br>
  config/db.php (настройте соединение с БД)
+ <br>
  config/params.php
 
 2) composer install
