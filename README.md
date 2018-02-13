@@ -42,6 +42,7 @@ INSTALLATION
  config/params.php
 
 2) composer install
+
 3) php yii migrate/up
 
 
@@ -49,10 +50,12 @@ CONFIGURATION (params.php)
 -------------
 
 nestingLevelPages - максимальный уровень вложенности страниц
+<br>
 durationCacheRoute - время кеширования url (в секундах)
 
 TODO
 -------------
 
 1) Верстка
+
 2) Логирование
