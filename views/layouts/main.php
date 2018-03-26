@@ -1,15 +1,14 @@
 <?php
 
 use app\assets\AppAsset;
-use app\components\PageUrlRule;
+use app\components\PagePath;
 use app\models\Page;
-use app\widgets\Alert;
 use app\widgets\PageBuildMenu;
+use yii\bootstrap\Alert;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\helpers\Html;
 use yii\helpers\StringHelper;
-use yii\helpers\Url;
 
 /* @var $this \yii\web\View */
 /* @var $content string */
@@ -17,17 +16,14 @@ use yii\helpers\Url;
 AppAsset::register($this);
 
 $menuItem = [];
-$id = \Yii::$app->params['page']['id'] ?? null;
-$path = \Yii::$app->params['page']['path'];
-$action = \Yii::$app->params['page']['action'];
-$isNestingAvailable = \Yii::$app->params['page']['isNestingAvailable'];
+$pageId = \Yii::$app->params['page']['id'] ?? null;
+$action = PagePath::getActionFromPath(\Yii::$app->request->getUrl() . '/');
 
-if ($action === 'page/' . PageUrlRule::ACTION_VIEW) {
-    if ($isNestingAvailable) {
-        $menuItem[] = ['label' => 'Добавить', 'url' => [$path . PageUrlRule::ACTION_ADD]];
-    }
-    if ($id !== null) {
-        $menuItem[] = ['label' => 'Редактировать', 'url' => [$path . PageUrlRule::ACTION_EDIT]];
+if ($action === ('page/' . PagePath::ACTION_VIEW)) {
+    $path = PagePath::getPathWithoutAction(\Yii::$app->getRequest()->getPathInfo());
+    $menuItem[] = ['label' => 'Добавить', 'url' => [$path . PagePath::ACTION_ADD]];
+    if ($pageId !== null) {
+        $menuItem[] = ['label' => 'Редактировать', 'url' => [$path . PagePath::ACTION_EDIT]];
     }
 }
 
@@ -68,12 +64,14 @@ if ($action === 'page/' . PageUrlRule::ACTION_VIEW) {
 			<div class="wiki-menu">
                 <?= PageBuildMenu::widget([
                     'nestedAttr'      => Page::COL_NAME,
-                    'contentCallback' => function ($page, array $nested) use ($id) {
+                    //TODO: Временное решение для вывода меню (Кешировать или выводить порционно)
+                    'data'            => Page::find()->getPagesForMenu(),
+                    'contentCallback' => function (Page $page) use ($pageId) {
                         $title = StringHelper::truncateWords(Html::encode($page[Page::COL_TITLE]), 3);
 
-                        return $id !== (int)$page[Page::COL_ID]
-                            ? Html::a($title, Url::home() . implode('/', $nested))
-                            : Html::tag('strong', $title);
+                        return $pageId !== (int)$page[Page::COL_ID]
+							? Html::a($title, $page->path)
+							: Html::tag('strong', $title);
 
                     },
                 ]) ?>

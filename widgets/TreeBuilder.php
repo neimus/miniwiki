@@ -15,20 +15,22 @@ use yii\helpers\Html;
 
 class TreeBuilder
 {
+    public $idAttr = 'id';
+
     /**
      * @var string
      */
     public $parentAttr = 'parent_id';
 
     /**
-     * @var string
+     * @var Closure|null
      */
-    public $valueAttr;
+    public $parentCallback;
 
     /**
      * @var string
      */
-    public $nestedAttr = 'id';
+    public $valueAttr;
 
     /**
      * @var string тег для дерева
@@ -70,10 +72,6 @@ class TreeBuilder
      */
     private $_items = [];
 
-    /**
-     * @var array вложенность
-     */
-    private $_nested = [];
 
     /**
      *
@@ -166,12 +164,12 @@ class TreeBuilder
     {
         $data = ArrayHelper::map($this->_items,
             function ($array, $default) {
-                if ($array instanceof ActiveRecord && $array->hasAttribute('id')) {
-                    return $array->id;
+                if ($array instanceof ActiveRecord && $array->hasAttribute($this->idAttr)) {
+                    return $array->{$this->idAttr};
                 }
 
-                if (\is_array($array) && isset($array['id'])) {
-                    return $array['id'];
+                if (\is_array($array) && isset($array[$this->idAttr])) {
+                    return $array[$this->idAttr];
                 }
 
                 $this->throwInvalidParams();
@@ -179,11 +177,15 @@ class TreeBuilder
             function ($array, $default) {
                 $id = null;
                 $parent_id = null;
-                if ($array instanceof ActiveRecord && $array->hasAttribute('id')) {
-                    $id = $array->id;
-                    $parent_id = $array->hasAttribute($this->parentAttr) ? $array->{$this->parentAttr} : null;
-                } elseif (\is_array($array) && isset($array['id'])) {
-                    $id = $array['id'];
+                if ($array instanceof ActiveRecord && $array->hasAttribute($this->idAttr)) {
+                    $id = $array->{$this->idAttr};
+                    if ($this->parentCallback !== null) {
+                        $parent_id = $array->{$this->parentCallback}();
+                    } else {
+                        $parent_id = $array->hasAttribute($this->parentAttr) ? $array->{$this->parentAttr} : null;
+                    }
+                } elseif (\is_array($array) && isset($array[$this->idAttr])) {
+                    $id = $array[$this->idAttr];
                     $parent_id = $array[$this->parentAttr] ?? null;
                 } else {
                     $this->throwInvalidParams();
@@ -235,13 +237,12 @@ class TreeBuilder
         $html = '';
         foreach ($tree as $item) {
             $value = $item['value'];
-            $this->_nested[] = $value[$this->nestedAttr];
 
             $html .= $this->renderTreeOpen();
             $html .= $this->renderItemOpen($item['id']);
 
             if (\is_callable($this->contentCallback)) {
-                $html .= $this->renderContent(\call_user_func($this->contentCallback, $item['value'], $this->_nested));
+                $html .= $this->renderContent(\call_user_func($this->contentCallback, $item['value']));
             } else {
 
                 if ($this->valueAttr !== null && $value instanceof ActiveRecord) {
@@ -255,7 +256,6 @@ class TreeBuilder
                 $html .= $this->treeToHtml($item['children']);
             }
 
-            array_pop($this->_nested);
             $html .= $this->renderItemClose();
             $html .= $this->renderTreeClose();
         }

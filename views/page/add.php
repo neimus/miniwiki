@@ -1,17 +1,15 @@
 <?php
 
 use app\models\Page;
-use app\models\PageRel;
 use yii\bootstrap\ActiveForm;
 use yii\bootstrap\Html;
 
 /* @var $this yii\web\View */
 /* @var $page Page */
 /* @var $parentPage Page|null */
-/* @var $pageRel PageRel */
 
 $this->title = Html::encode($parentPage ? $parentPage->title : 'МиниВики');
-\Yii::$app->params['page']['id'] = $pageRel->parent_id;
+\Yii::$app->params['page']['id'] = $parentPage !== null ? $parentPage->id : null;
 
 ?>
 <div class="site-index">
@@ -50,16 +48,11 @@ $this->title = Html::encode($parentPage ? $parentPage->title : 'МиниВики
                     'rows'        => '10',
                     'placeholder' => $page->getPlaceholder(Page::COL_BODY),
                 ]) ?>
-                <?= $form->field($pageRel, PageRel::COL_PARENT_ID)
-                    ->hiddenInput()
-                    ->label(false)
-                    ->hint(false)
-                    ->error(false) ?>
 
 				<div class="form-group">
 					<div class="col-lg-offset-1 col-lg-7">
                         <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success', 'name' => 'save-button']) ?>
-                        <?= Html::a('Отменить', \Yii::$app->params['page']['path'],
+                        <?= Html::a('Отменить', $parentPage !== null ? $parentPage->path : \Yii::$app->getHomeUrl(),
                             ['class' => 'btn btn-primary pull-right', 'name' => 'cancel-button']) ?>
 					</div>
 				</div>

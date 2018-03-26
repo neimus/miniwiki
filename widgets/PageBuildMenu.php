@@ -7,7 +7,6 @@
 
 namespace app\widgets;
 
-use app\models\Page;
 use yii\bootstrap\Html;
 use yii\bootstrap\Widget;
 
@@ -16,7 +15,7 @@ class PageBuildMenu extends Widget
     /**
      * @var string
      */
-    public $parentAttr = 'parent_id';
+    public $parentCallback = 'getParentId';
 
     /**
      * @var
@@ -38,23 +37,15 @@ class PageBuildMenu extends Widget
      */
     public $data = [];
 
-    public function init()
-    {
-        $this->data = Page::find()
-            ->queryPages()
-            ->orderBy(Page::columnName(Page::COL_NAME))
-            ->all();
-    }
-
     public function run()
     {
         try {
             $builder = TreeBuilder::instance($this->data, array(
                 'treeTag'            => 'ul',
                 'itemTag'            => 'li',
-                'parentAttr'         => $this->parentAttr,
+                'idAttr'             => 'name',
+                'parentCallback'     => $this->parentCallback,
                 'valueAttr'          => $this->valueAttr,
-                'nestedAttr'         => $this->nestedAttr,
                 'contentCallback'    => $this->contentCallback,
                 'treeHtmlOptions'    => function () {
                     return $this->getTreeOptions();

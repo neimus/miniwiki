@@ -1,6 +1,5 @@
 <?php
 
 return [
-    'nestingLevelPages' => 10, // максимальный уровень вложенности страниц
     'durationCacheRoute' => 3600 // время (в секундах) кеширования url
 ];

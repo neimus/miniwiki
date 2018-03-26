@@ -1,13 +1,13 @@
 <?php
 
-use app\components\PageUrlRule;
+use app\components\PagePath;
 use yii\bootstrap\Html;
 
 /* @var $this yii\web\View */
 /* @var $pages array */
 
 $this->title = 'MiniWiki';
-$pathAdd = '/' . PageUrlRule::ACTION_ADD;
+$pathAdd = '/' . PagePath::ACTION_ADD;
 
 ?>
 <div class="site-index">

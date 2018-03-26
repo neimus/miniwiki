@@ -45,7 +45,7 @@ $this->title = Html::encode($page->title);
 				<div class="form-group">
 					<div class="col-lg-offset-1 col-lg-7">
                         <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success', 'name' => 'save-button']) ?>
-                        <?= Html::a('Отменить', \Yii::$app->params['page']['path'],
+                        <?= Html::a('Отменить', $page->path,
                             ['class' => 'btn btn-primary pull-right', 'name' => 'cancel-button']) ?>
 					</div>
 				</div>

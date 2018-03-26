@@ -8,11 +8,13 @@
 namespace app\models;
 
 use yii\base\Model;
+use yii\db\ActiveRecord;
 
 /**
- * @property Model $this
+ * @property string $modelErrors
+ * @property Model self
  */
-trait ModelTrait
+abstract class AbstractModel extends ActiveRecord
 {
     public static function columnName(string $name): string
     {
