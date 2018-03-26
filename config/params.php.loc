@@ -1,5 +1,4 @@
 <?php
 
 return [
-    'durationCacheRoute' => 3600 // время (в секундах) кеширования url
 ];
